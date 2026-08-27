@@ -4,43 +4,47 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OmegaMC - Servidor de Minecraft</title>
-
-<!-- Icono de la pestaña (Favicon) -->
 <link rel="icon" type="image/png" href="logo.png">
-
 <style>
-    body { 
-        margin:0; font-family:'Segoe UI',Arial,sans-serif; color:white; 
-        background:#020105; /* El fondo oscuro real se queda aquí abajo */
-        overflow:hidden; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:25px; 
-    }
-    
-    /* El lienzo se mantiene al frente para la estela, pero ahora su contenido es transparente */
+    body { margin:0; font-family:'Segoe UI',Arial,sans-serif; color:white; background:#020105; overflow:hidden; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:25px; }
     canvas { position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:6; pointer-events:none; }
-    
     .led-title-img { max-width:460px; width:90%; height:auto; z-index:5; margin:0; }
     .main-card { text-align:center; width:90%; max-width:440px; display:flex; flex-direction:column; align-items:center; gap:20px; z-index:5; background:rgba(8,4,15,0.6); padding:30px; border-radius:20px; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(168,85,247,0.2); }
     .logo-img { max-width:140px; height:auto; border-radius:12px; filter:drop-shadow(0 0 15px rgba(168,85,247,0.7)); animation:floatAnimation 4s ease-in-out infinite; }
     @keyframes floatAnimation { 0%,100% { transform:translateY(0px); } 50% { transform:translateY(-8px); } }
     
+    /* Casilla estática de seguridad arriba a la izquierda */
+    .anti-cheat-container { 
+        position: fixed; top: 25px; left: 25px; z-index: 10; max-width: 320px;
+        background: rgba(12, 8, 20, 0.85); border: 2px solid #a855f7; border-radius: 12px; 
+        padding: 15px; box-sizing: border-box; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    }
+    .anti-cheat-title { color: #d8b4fe; font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
+    .anti-cheat-text { color: #e9d5ff; font-size: 13px; line-height: 1.5; margin: 0; }
+
     .ip-box { background:rgba(12,8,20,0.85); border:2px solid #a855f7; border-radius:12px; padding:30px 20px; box-sizing:border-box; width:100%; animation:ledBlinkBox 2.5s infinite alternate ease-in-out; }
-    @keyframes ledBlinkBox { 0%,100% { border-color:#581c87; box-shadow:0 0 15px rgba(168, 85, 247, 0.2); } 50% { border-color:#c084fc; box-shadow:0 0 35px #a855f7, 0 0 10px #00f2fe; } }
-    
+    @keyframes ledBlinkBox { 0%,100% { border-color:#581c87; box-shadow:0 0 15px rgba(168,85,247,0.2); } 50% { border-color:#c084fc; box-shadow:0 0 35px #a855f7, 0 0 10px #00f2fe; } }
     .subtitle { color:#d8b4fe; font-size:13px; font-weight:bold; letter-spacing:4px; margin-bottom:12px; text-transform:uppercase; }
     .ip { font-size:38px; font-family:'Consolas','Courier New',monospace; font-weight:bold; margin-bottom:22px; letter-spacing:1px; }
-    .copy-btn { background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.6); border-radius:6px; padding:12px 24px; display:inline-flex; align-items:center; justify-content:center; gap:10px; cursor:pointer; color:white; font-size:15px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; transition:all 0.2s ease-in-out; min-width:170px; }
-    .copy-btn:hover { background:#a855f7; box-shadow:0 0 20px rgba(168,85,247,0.6); border-color:#d8b4fe; }
+    .copy-btn { background:rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.6); border-radius: 6px; padding: 12px 24px; display:inline-flex; align-items:center; justify-content:center; gap:10px; cursor:pointer; color:white; font-size:15px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; transition:all 0.2s ease-in-out; min-width:170px; }
+    .copy-btn:hover { background:#a855f7; box-shadow:0 0 20px rgba(168, 85, 247, 0.6); border-color:#d8b4fe; }
     .bottom-nav { position:fixed; bottom:30px; left:0; width:100%; display:flex; justify-content:space-between; align-items:center; box-sizing:border-box; padding:0 40px; z-index:5; }
-    .nav-box { background:rgba(15,10,25,0.8); border:1px solid rgba(168,85,247,0.4); border-radius:8px; padding:12px 20px; display:inline-flex; align-items:center; justify-content:center; gap:10px; color:white; text-decoration:none; font-size:14px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s ease-in-out; box-shadow:0 4px 15px rgba(0, 0, 0, 0.4); min-width:130px; }
-    .nav-box:hover { background:rgba(168,85,247,0.15); border-color:#a855f7; box-shadow:0 0 15px rgba(168,85,247,0.4); transform:translateY(-3px); }
-    .nav-box.discord-color { border-color:rgba(88,101,242,0.4); }
-    .nav-box.discord-color:hover { background:rgba(88,101,242,0.2); border-color:#5865F2; box-shadow:0 0 15px rgba(88,101,242,0.4); }
+    .nav-box { background:rgba(15,10,25,0.8); border:1px solid rgba(168, 85, 247, 0.4); border-radius:8px; padding:12px 20px; display:inline-flex; align-items:center; justify-content:center; gap:10px; color:white; text-decoration:none; font-size:14px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s ease-in-out; box-shadow:0 4px 15px rgba(0, 0, 0, 0.4); min-width:130px; }
+    .nav-box:hover { background:rgba(168, 85, 247, 0.15); border-color:#a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); transform:translateY(-3px); }
+    .nav-box.discord-color { border-color:rgba(88, 101, 242, 0.4); }
+    .nav-box.discord-color:hover { background:rgba(88, 101, 242, 0.2); border-color:#5865F2; box-shadow: 0 0 15px rgba(88, 101, 242, 0.4); }
     .nav-box svg, .copy-btn svg { width:18px; height:18px; fill:currentColor; }
 </style>
 </head>
 <body>
 
 <canvas id="space-canvas"></canvas>
+
+<div class="anti-cheat-container">
+    <div class="anti-cheat-title">🛡️ SEGURIDAD</div>
+    <p class="anti-cheat-text">OmegaMC cuenta con SS-Tool y programas propios libres de virus y aptos para formar una comunidad limpia y sana.</p>
+</div>
 
 <img src="titulo.png" alt="OMEGAMC" class="led-title-img">
 
@@ -79,11 +83,9 @@
             setTimeout(() => { btnText.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copiar IP'; }, 2000);
         });
     }
-
     const canvas = document.getElementById("space-canvas"); const ctx = canvas.getContext("2d");
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     resizeCanvas(); window.addEventListener("resize", resizeCanvas);
-
     let spaceParticles = []; const spaceColors = ["#ffffff", "#e2e8f0", "#cbd5e1", "#f1f5f9"];
     class FloatingStar {
         constructor() {
@@ -99,20 +101,17 @@
         draw() { ctx.save(); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
     }
     for (let i = 0; i < 200; i++) { spaceParticles.push(new FloatingStar()); }
-
     let mouseHistory = []; const maxHistoryLength = 22; let hue = 0;
     window.addEventListener('mousemove', (e) => { mouseHistory.push({ x: e.clientX, y: e.clientY }); if (mouseHistory.length > maxHistoryLength) mouseHistory.shift(); });
-
     function renderLoop() {
-        // CORRECCIÓN: Limpia de forma completamente transparente en lugar de pintar de negro sólido
-        ctx.clearRect(0, 0, canvas.width, canvas.height); 
-        
-        spaceParticles.forEach(star => { star.update(); star.draw(); });
+        ctx.clearRect(0, 0, canvas.width, canvas.height); spaceParticles.forEach(star => { star.update(); star.draw(); });
         if (mouseHistory.length > 1) {
             ctx.save(); ctx.shadowBlur = 12;
             for (let i = 1; i < mouseHistory.length; i++) {
                 ctx.beginPath(); ctx.moveTo(mouseHistory[i - 1].x, mouseHistory[i - 1].y); ctx.lineTo(mouseHistory[i].x, mouseHistory[i].y);
-                const currentHue = (hue + (i * 6)) % 360; ctx.strokeStyle = `hsl(${currentHue}, 100%, 65%)`; ctx.shadowColor = `hsl(${currentHue}, 100%, 65%)`;
+                const currentHue = (hue + (i * 6)) % 360; 
+                ctx.strokeStyle = 'hsl(' + currentHue + ', 100%, 65%)'; 
+                ctx.shadowColor = 'hsl(' + currentHue + ', 100%, 65%)';
                 ctx.lineWidth = (i / mouseHistory.length) * 4.5; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.stroke();
             }
             ctx.restore(); hue += 4; if(Math.random() > 0.4) mouseHistory.shift();
@@ -120,6 +119,3 @@
         requestAnimationFrame(renderLoop);
     }
     renderLoop();
-</script>
-</body>
-</html>
