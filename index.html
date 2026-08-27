@@ -13,7 +13,6 @@
     .logo-img { max-width:140px; height:auto; border-radius:12px; filter:drop-shadow(0 0 15px rgba(168,85,247,0.7)); animation:floatAnimation 4s ease-in-out infinite; }
     @keyframes floatAnimation { 0%,100% { transform:translateY(0px); } 50% { transform:translateY(-8px); } }
     
-    /* Casilla estática de seguridad arriba a la izquierda */
     .anti-cheat-container { 
         position: fixed; top: 25px; left: 25px; z-index: 10; max-width: 320px;
         background: rgba(12, 8, 20, 0.85); border: 2px solid #a855f7; border-radius: 12px; 
@@ -27,7 +26,7 @@
     @keyframes ledBlinkBox { 0%,100% { border-color:#581c87; box-shadow:0 0 15px rgba(168,85,247,0.2); } 50% { border-color:#c084fc; box-shadow:0 0 35px #a855f7, 0 0 10px #00f2fe; } }
     .subtitle { color:#d8b4fe; font-size:13px; font-weight:bold; letter-spacing:4px; margin-bottom:12px; text-transform:uppercase; }
     .ip { font-size:38px; font-family:'Consolas','Courier New',monospace; font-weight:bold; margin-bottom:22px; letter-spacing:1px; }
-    .copy-btn { background:rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.6); border-radius: 6px; padding: 12px 24px; display:inline-flex; align-items:center; justify-content:center; gap:10px; cursor:pointer; color:white; font-size:15px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; transition:all 0.2s ease-in-out; min-width:170px; }
+    .copy-btn { background:rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.6); border-radius: 6px; padding: 12px 24px; display:inline-flex; align-items:center; justify-content:center; gap:10px; cursor:pointer; color:white; font-size:15px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; transition:all 0.2s ease-in-out; min-width:170px; user-select:none; }
     .copy-btn:hover { background:#a855f7; box-shadow:0 0 20px rgba(168, 85, 247, 0.6); border-color:#d8b4fe; }
     .bottom-nav { position:fixed; bottom:30px; left:0; width:100%; display:flex; justify-content:space-between; align-items:center; box-sizing:border-box; padding:0 40px; z-index:5; }
     .nav-box { background:rgba(15,10,25,0.8); border:1px solid rgba(168, 85, 247, 0.4); border-radius:8px; padding:12px 20px; display:inline-flex; align-items:center; justify-content:center; gap:10px; color:white; text-decoration:none; font-size:14px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s ease-in-out; box-shadow:0 4px 15px rgba(0, 0, 0, 0.4); min-width:130px; }
@@ -75,47 +74,7 @@
     </a>
 </div>
 
-<script>
-    function copyIP() {
-        const ip = document.getElementById("ip").innerText; const btnText = document.getElementById("btnText");
-        navigator.clipboard.writeText(ip).then(() => {
-            btnText.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> ¡Copiado!';
-            setTimeout(() => { btnText.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copiar IP'; }, 2000);
-        });
-    }
-    const canvas = document.getElementById("space-canvas"); const ctx = canvas.getContext("2d");
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    resizeCanvas(); window.addEventListener("resize", resizeCanvas);
-    let spaceParticles = []; const spaceColors = ["#ffffff", "#e2e8f0", "#cbd5e1", "#f1f5f9"];
-    class FloatingStar {
-        constructor() {
-            this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.radius = Math.random() * 1.4 + 0.3;
-            this.color = spaceColors[Math.floor(Math.random() * spaceColors.length)];
-            this.vx = (Math.random() - 0.5) * 0.35; this.vy = (Math.random() - 0.5) * 0.35;
-            this.alpha = Math.random(); this.speed = Math.random() * 0.01 + 0.003; this.growing = Math.random() > 0.5;
-        }
-        update() {
-            this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > canvas.width) this.vx *= -1; if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-            if (this.growing) { this.alpha += this.speed; if (this.alpha >= 1) this.growing = false; } else { this.alpha -= this.speed; if (this.alpha <= 0.15) this.growing = true; }
-        }
-        draw() { ctx.save(); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
-    }
-    for (let i = 0; i < 200; i++) { spaceParticles.push(new FloatingStar()); }
-    let mouseHistory = []; const maxHistoryLength = 22; let hue = 0;
-    window.addEventListener('mousemove', (e) => { mouseHistory.push({ x: e.clientX, y: e.clientY }); if (mouseHistory.length > maxHistoryLength) mouseHistory.shift(); });
-    function renderLoop() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); spaceParticles.forEach(star => { star.update(); star.draw(); });
-        if (mouseHistory.length > 1) {
-            ctx.save(); ctx.shadowBlur = 12;
-            for (let i = 1; i < mouseHistory.length; i++) {
-                ctx.beginPath(); ctx.moveTo(mouseHistory[i - 1].x, mouseHistory[i - 1].y); ctx.lineTo(mouseHistory[i].x, mouseHistory[i].y);
-                const currentHue = (hue + (i * 6)) % 360; 
-                ctx.strokeStyle = 'hsl(' + currentHue + ', 100%, 65%)'; 
-                ctx.shadowColor = 'hsl(' + currentHue + ', 100%, 65%)';
-                ctx.lineWidth = (i / mouseHistory.length) * 4.5; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.stroke();
-            }
-            ctx.restore(); hue += 4; if(Math.random() > 0.4) mouseHistory.shift();
-        }
-        requestAnimationFrame(renderLoop);
-    }
-    renderLoop();
+<!-- Enlace al archivo de lógica separado -->
+<script src="efectos.js"></script>
+</body>
+</html>
